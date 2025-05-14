@@ -4,11 +4,9 @@
 static const std::vector<mrta::ParameterInfo> ParameterInfos
 {
     { Param::ID::Enabled,   Param::Name::Enabled,   "Off", "On", true },
-    { Param::ID::Drive,     Param::Name::Drive,     "", 1.f, 1.f, 10.f, 0.1f, 1.f },
     { Param::ID::Frequency, Param::Name::Frequency, "Hz", 1000.f, 20.f, 20000.f, 1.f, 0.3f },
     { Param::ID::Resonance, Param::Name::Resonance, "", 0.f, 0.f, 1.f, 0.001f, 1.f },
     { Param::ID::Mode,      Param::Name::Mode,      { "LPF12", "HPF12", "BPF12", "LPF24", "HPF24", "BPF24" }, 3 },
-    { Param::ID::PostGain,  Param::Name::PostGain,  "dB", 0.0f, -60.f, 12.f, 0.1f, 3.8018f },
 };
 
 MainProcessor::MainProcessor() :
@@ -19,13 +17,6 @@ MainProcessor::MainProcessor() :
     {
         DBG(Param::Name::Enabled + ": " + juce::String { value });     // debugging 
         filter.setEnabled(value > 0.5f);
-    });
-
-    parameterManager.registerParameterCallback(Param::ID::Drive,
-    [this] (float value, bool /*forced*/)
-    {
-        DBG(Param::Name::Drive + ": " + juce::String { value });
-        filter.setDrive(value);
     });
 
     parameterManager.registerParameterCallback(Param::ID::Frequency,
@@ -49,19 +40,6 @@ MainProcessor::MainProcessor() :
         filter.setMode(static_cast<juce::dsp::LadderFilter<float>::Mode>(std::floor(value)));
     });
 
-    parameterManager.registerParameterCallback(Param::ID::PostGain,
-    [this] (float value, bool forced)
-    {
-        DBG(Param::Name::PostGain + ": " + juce::String { value });
-        float dbValue { 0.f };
-        if (value > -60.f)
-            dbValue = std::pow(10.f, value * 0.05f);
-
-        if (forced)
-            outputGain.setCurrentAndTargetValue(dbValue);
-        else
-            outputGain.setTargetValue(dbValue);
-    });
 }
 
 MainProcessor::~MainProcessor()

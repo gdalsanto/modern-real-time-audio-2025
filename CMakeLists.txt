@@ -35,7 +35,7 @@ endif()
 # Add JUCE
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/JUCE)
 
-# Add MRTA module
+# Add MRTA module (using a juce cmake function)
 juce_add_module(${CMAKE_CURRENT_SOURCE_DIR}/modules/mrta_utils)
 
 # General variables
@@ -72,7 +72,7 @@ function(add_plugin target)
     #message(STATUS "  SOURCES: ${AP_SOURCES}")
     #message(STATUS "  INCLUDE_DIRS: ${AP_INCLUDE_DIRS}")
 
-    # Add juce plugin target
+    # Add juce plugin target - variables that need to be set 
     juce_add_plugin(${target}
         PRODUCT_NAME ${AP_PROD_NAME}
         VERSION ${AP_VERSION}
@@ -132,6 +132,7 @@ set(gui_source ${CMAKE_CURRENT_SOURCE_DIR}/projects/GUI)
 # add example project
 set(mfrtaa_source ${CMAKE_CURRENT_SOURCE_DIR}/projects/MyFirstRealTimeAudioApp)
 
+# how to ad a plugin to the project
 add_plugin(mfrtaa
     VERSION 0.1.0
     PLUGIN_NAME "My First RT Audio App"
@@ -143,3 +144,31 @@ add_plugin(mfrtaa
         ${mfrtaa_source}/PluginProcessor.cpp
     INCLUDE_DIRS
         ${mfrtaa_source})
+
+set(msrtaa_source ${CMAKE_CURRENT_SOURCE_DIR}/projects/MySecondRealTimeAudioApp)
+
+add_plugin(msrtaa
+    VERSION 0.1.0
+    PLUGIN_NAME "My Second RT Audio App"
+    PROD_NAME MySecondtRTAudioApp
+    PROD_CODE Rtap
+    SYNTH FALSE
+    SOURCES
+        ${msrtaa_source}/PluginEditor.cpp
+        ${msrtaa_source}/PluginProcessor.cpp
+    INCLUDE_DIRS
+        ${msrtaa_source})
+
+set(hw1_source ${CMAKE_CURRENT_SOURCE_DIR}/projects/HW1-RingModulator)
+
+add_plugin(hw1
+    VERSION 0.1.0
+    PLUGIN_NAME "My Ring Modulator"
+    PROD_NAME MyRingModulator
+    PROD_CODE Rtap
+    SYNTH FALSE
+    SOURCES
+        ${hw1_source}/PluginEditor.cpp
+        ${hw1_source}/PluginProcessor.cpp
+    INCLUDE_DIRS
+        ${hw1_source})

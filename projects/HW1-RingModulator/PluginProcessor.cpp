@@ -3,64 +3,58 @@
 
 static const std::vector<mrta::ParameterInfo> ParameterInfos
 {
-    { Param::ID::Enabled,   Param::Name::Enabled,   "Off", "On", true },
-    { Param::ID::Drive,     Param::Name::Drive,     "", 1.f, 1.f, 10.f, 0.1f, 1.f },
-    { Param::ID::Frequency, Param::Name::Frequency, "Hz", 1000.f, 20.f, 20000.f, 1.f, 0.3f },
-    { Param::ID::Resonance, Param::Name::Resonance, "", 0.f, 0.f, 1.f, 0.001f, 1.f },
-    { Param::ID::Mode,      Param::Name::Mode,      { "LPF12", "HPF12", "BPF12", "LPF24", "HPF24", "BPF24" }, 3 },
-    { Param::ID::PostGain,  Param::Name::PostGain,  "dB", 0.0f, -60.f, 12.f, 0.1f, 3.8018f },
+    // bool constructor will be called
+    { Param::ID::Enabled,   Param::Name::Enabled, "Off", "On", true },    
+    // float constructor will be called 
+    {   
+        Param::ID::Frequency, 
+        Param::Name::Frequency, 
+        "Hz", 
+        1000.f,     // default value
+        20.f,       // min value
+        20000.f,    // max value
+        1.f,        // step value
+        0.3f        // skew value
+    },
+    { Param::ID::Depth, Param::Name::Depth, "Lin", 0.0f, 0.0f, 1.f, 0.01f, 0.3f  }
 };
 
+
+/* constructor: Register all callback lambda function for the parameters
+The callbacks will be run at every parameter change event.
+DBG will print a string - this is usefull for debugging*/
 MainProcessor::MainProcessor() :
     parameterManager(*this, ProjectInfo::projectName, ParameterInfos)
 {
+    // If the effect is enabled, the modulation depth will be set to the current value
     parameterManager.registerParameterCallback(Param::ID::Enabled,
     [this] (float value, bool /*forced*/)
     {
         DBG(Param::Name::Enabled + ": " + juce::String { value });     // debugging 
-        filter.setEnabled(value > 0.5f);
-    });
-
-    parameterManager.registerParameterCallback(Param::ID::Drive,
-    [this] (float value, bool /*forced*/)
-    {
-        DBG(Param::Name::Drive + ": " + juce::String { value });
-        filter.setDrive(value);
+        float defaultFreq { 1000.f };
+        if (value > 0.f) {
+            float modulationValue = depth.getCurrentValue() * 
+                                     std::cos(2.0 * juce::MathConstants<float>::pi * defaultFreq / this->samplingFreq * this->n);
+            modulation.setCurrentAndTargetValue(modulationValue);
+        } else {
+            modulation.setCurrentAndTargetValue(0.f);
+        }
     });
 
     parameterManager.registerParameterCallback(Param::ID::Frequency,
     [this] (float value, bool /*forced*/)   // 
     {
         DBG(Param::Name::Frequency + ": " + juce::String { value });
-        filter.setCutoffFrequencyHz(value);
+        float modulationValue = depth.getCurrentValue() * 
+                                 std::cos(2.0 * juce::MathConstants<float>::pi * value / this->samplingFreq * this->n);
+        modulation.setTargetValue(modulationValue);
     });
 
-    parameterManager.registerParameterCallback(Param::ID::Resonance,
-    [this] (float value, bool /*forced*/)
+    parameterManager.registerParameterCallback(Param::ID::Depth,
+    [this] (float value, bool )
     {
-        DBG(Param::Name::Resonance + ": " + juce::String { value });
-        filter.setResonance(value);
-    });
-
-    parameterManager.registerParameterCallback(Param::ID::Mode,
-    [this] (float value, bool /*forced*/)
-    {
-        DBG(Param::Name::Mode + ": " + juce::String { value });
-        filter.setMode(static_cast<juce::dsp::LadderFilter<float>::Mode>(std::floor(value)));
-    });
-
-    parameterManager.registerParameterCallback(Param::ID::PostGain,
-    [this] (float value, bool forced)
-    {
-        DBG(Param::Name::PostGain + ": " + juce::String { value });
-        float dbValue { 0.f };
-        if (value > -60.f)
-            dbValue = std::pow(10.f, value * 0.05f);
-
-        if (forced)
-            outputGain.setCurrentAndTargetValue(dbValue);
-        else
-            outputGain.setTargetValue(dbValue);
+        DBG(Param::Name::Depth + ": " + juce::String { value });
+        depth.setTargetValue(value); // smooth the gain change
     });
 }
 
@@ -71,28 +65,30 @@ MainProcessor::~MainProcessor()
 void MainProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
     juce::uint32 numChannels { static_cast<juce::uint32>(std::max(getMainBusNumInputChannels(), getMainBusNumOutputChannels())) };
-    filter.prepare({ sampleRate, static_cast<juce::uint32>(samplesPerBlock), numChannels });
-    outputGain.reset(sampleRate, 0.01f);
+    this->samplingFreq = static_cast<int>(sampleRate);
+    this->n = 0;
+    depth.reset(sampleRate, 0.01f); // sets the sample rate and the duration of the ramp 
+    modulation.reset(sampleRate, 0.01f); // sets the sample rate and the duration of the ramp
     parameterManager.updateParameters(true);
 }
 
 void MainProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& /*midiMessages*/)
 {
-    juce::ScopedNoDenormals noDenormals;
+    juce::ScopedNoDenormals noDenormals;    // set the denormals to zero
     parameterManager.updateParameters();
 
     {
         juce::dsp::AudioBlock<float> audioBlock(buffer.getArrayOfWritePointers(), buffer.getNumChannels(), buffer.getNumSamples());
         juce::dsp::ProcessContextReplacing<float> ctx(audioBlock);
-        filter.process(ctx);
     }
-
-    outputGain.applyGain(buffer, buffer.getNumSamples());
+    this->n += buffer.getNumSamples();
+    modulation.applyGain(buffer, buffer.getNumSamples());
 }
 
 void MainProcessor::releaseResources()
 {
-    filter.reset();
+    this->n = 0;
+    // filter.reset();
 }
 
 void MainProcessor::getStateInformation(juce::MemoryBlock& destData)

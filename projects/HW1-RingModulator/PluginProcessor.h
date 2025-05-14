@@ -7,21 +7,16 @@ namespace Param
     namespace ID
     {
         static const juce::String Enabled { "enabled" };
-        static const juce::String Drive { "drive" };
         static const juce::String Frequency { "frequency" };
-        static const juce::String Resonance { "resonance" };
-        static const juce::String Mode { "mode" };
-        static const juce::String PostGain { "post_gain" };
+        static const juce::String Depth { "depth" };
+
     }
 
     namespace Name
     {
         static const juce::String Enabled { "Enabled" };
-        static const juce::String Drive { "Drive" };
         static const juce::String Frequency { "Frequency" };
-        static const juce::String Resonance { "Resonance" };
-        static const juce::String Mode { "Mode" };
-        static const juce::String PostGain { "Post-Gain" };
+        static const juce::String Depth { "Depth" };
     }
 }
 
@@ -40,6 +35,10 @@ public:
 
     mrta::ParameterManager& getParameterManager() { return parameterManager; }
 
+    // create a member to store the sampling frequency
+
+    int samplingFreq = 48000;
+    int n = 0;
     //==============================================================================
     juce::AudioProcessorEditor* createEditor() override;
     bool hasEditor() const override;
@@ -58,8 +57,9 @@ public:
 
 private:
     mrta::ParameterManager parameterManager;
-    juce::dsp::LadderFilter<float> filter;
-    juce::SmoothedValue<float> outputGain;
+    juce::SmoothedValue<float> modulation;
+    juce::SmoothedValue<float> depth;
+
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainProcessor)
 };
