@@ -26,9 +26,11 @@ void ParametricEQAudioProcessorEditor::paint (juce::Graphics& g)
     g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
 }
 
-void ParametricEQAudioProcessorEditor::resized()
+void ParametricEQAudioProcessorEditor::resized()   // it will be called at the begining because we are changing from 0 
 {
-    auto localBounds { getLocalBounds() };
+    // this will create the three vertical panes 
+    // each pane is "cut" from the parent component and given to the parameter editor
+    auto localBounds { getLocalBounds() };   // 
     band0ParameterEditor.setBounds(localBounds.removeFromLeft(BandWidth));
     band1ParameterEditor.setBounds(localBounds.removeFromLeft(BandWidth));
     band2ParameterEditor.setBounds(localBounds);

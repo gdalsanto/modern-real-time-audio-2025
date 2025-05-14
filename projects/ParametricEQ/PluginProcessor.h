@@ -58,10 +58,12 @@ namespace Param
         static const float GainMax { 24.f };
         static const float GainInc { 0.1f };
         static const float GainSkw { 1.f };
-
+        
+        // the order needs to match the order of the types in the DSP::ParametricEqualizer
         static const juce::StringArray Types { "Flat", "High Pass", "Low Shelf", "Peak", "Low Pass", "High Shelf" };
     }
 
+    // these are just labels for the units but not used in the DSP side 
     namespace Unit
     {
         static const juce::String Freq { "Hz" };
@@ -69,7 +71,7 @@ namespace Param
     }
 }
 
-class ParametricEQAudioProcessor : public juce::AudioProcessor
+class ParametricEQAudioProcessor : public juce::AudioProcessor  // AudioProcessor is where num of channels is defined
 {
 public:
     ParametricEQAudioProcessor();

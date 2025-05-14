@@ -13,8 +13,9 @@ public:
     Biquad();
     ~Biquad();
 
-    Biquad(const Biquad&);
-    const Biquad& operator=(const Biquad&);
+    // this time we want to keep the default copy constructor
+    Biquad(const Biquad&);  // so that we are able to create another Biquad instance from an existing one (Biquad a(b))
+    const Biquad& operator=(const Biquad&); // make the assignment operator so that we can assign one Biquad to another ( a == b)
 
     Biquad(Biquad&&) = delete;
     const Biquad& operator=(Biquad&&) = delete;
@@ -22,7 +23,7 @@ public:
     static const unsigned int CoeffsPerSection = 5;
     static const unsigned int StatesPerSection = 4;
 
-    // Clear all states
+    // Clear all states - good idea if there's a big change (e.g. change in type of filter)
     void clear();
 
     // Reallocate state storage
@@ -33,7 +34,7 @@ public:
     // Calling this method will clear the coefficients and states
     void reallocateSections(unsigned int numSections);
 
-    // Set new coeffs to a section
+    // Set new coeffs to just the chosen section
     void setSectionCoeffs(const std::array<float, CoeffsPerSection>& newSectionCoeffs, unsigned int section);
 
     // Process audio
@@ -42,6 +43,7 @@ public:
 
     // Process audio
     // Single sample flavour
+    // output and input must have only one sample per channel
     void process(float* output, const float* input, unsigned int numChannels);
 
     // return the number of currently allocated channels
@@ -56,6 +58,7 @@ private:
 
     // vector of coeffs of all sections
     // [sos0_b0, sos0_b1, sos0_b2, sos0_a1, sos0_a2, sos1_b0, sos1_b1, ...]
+    // flat array with all the coefficients
     std::vector<float> coeffs;
 
     // vector of states of all channels and sections

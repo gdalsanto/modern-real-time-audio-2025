@@ -2,18 +2,22 @@
 
 #include <algorithm>
 
+// hyrarchy of biquads ch-sec-state
 namespace DSP
 {
 
 Biquad::Biquad(unsigned int maxNumSections, unsigned int maxNumChannels) :
     allocatedChannels { maxNumChannels },
     allocatedSections { maxNumSections },
-    coeffs(allocatedSections * CoeffsPerSection, 0.f),
+    coeffs(allocatedSections * CoeffsPerSection, 0.f),  // always good to initialize them with zeros instead of random 
     states(allocatedChannels * allocatedSections * StatesPerSection, 0.f)
 {
 }
 
-Biquad::Biquad()
+// default constructor - this is the only option when we want to create a vector of Biquads
+// std:vetor<Biquad> 
+// then we can use reallocateChannel s and reallocateSections
+Biquad::Biquad() // why do we have two ctor?
 {
 }
 
@@ -88,13 +92,13 @@ void Biquad::process(float* output, const float* input, unsigned int numChannels
         {
             const unsigned int stateOffset { c * allocatedSections * StatesPerSection + s * StatesPerSection };
             const unsigned int coeffOffset { s * CoeffsPerSection };
-
+            // get filter coefficents and the values that get summed
             float acc { x * coeffs[coeffOffset + 0] }; // b0
             acc += coeffs[coeffOffset + 1] * states[stateOffset + 0]; // b1
             acc += coeffs[coeffOffset + 2] * states[stateOffset + 1]; // b2
             acc -= coeffs[coeffOffset + 3] * states[stateOffset + 2]; // a1
             acc -= coeffs[coeffOffset + 4] * states[stateOffset + 3]; // a2
-
+            // update the states
             states[stateOffset + 1] = states[stateOffset + 0];
             states[stateOffset + 0] = x;
             states[stateOffset + 3] = states[stateOffset + 2];

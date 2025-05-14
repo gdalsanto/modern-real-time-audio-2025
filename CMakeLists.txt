@@ -136,7 +136,7 @@ add_plugin(mfrtaa
     VERSION 0.1.0
     PLUGIN_NAME "My First RT Audio App"
     PROD_NAME MyFirstRTAudioApp
-    PROD_CODE Rtap
+    PROD_CODE Rtap      # this one has to be unique otherwise the DAW will not be able to distinguish between the plugins
     SYNTH FALSE
     SOURCES
         ${mfrtaa_source}/PluginEditor.cpp
@@ -151,7 +151,7 @@ add_plugin(ringmod
     VERSION 0.1.0
     PLUGIN_NAME "Ring Modulator"
     PROD_NAME RingModulator
-    PROD_CODE Rmod
+    PROD_CODE Rmod  
     SYNTH FALSE
     SOURCES
         ${ringmod_source}/PluginEditor.cpp

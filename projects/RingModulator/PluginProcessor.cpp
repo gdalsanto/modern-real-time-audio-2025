@@ -19,7 +19,7 @@ RingModAudioProcessor::RingModAudioProcessor() :
     parameterManager.registerParameterCallback(Param::ID::ModType,
     [this] (float value, bool /*force*/)
     {
-        DSP::RingMod::ModType modType = static_cast<DSP::RingMod::ModType>(std::round(value));
+        DSP::RingMod::ModType modType = static_cast<DSP::RingMod::ModType>(std::round(value));  // it's cleaner to cast it to int at a later stage instead of creating a different Callback type
         ringMod.setModType(modType);
     });
 }

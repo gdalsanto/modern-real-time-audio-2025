@@ -9,12 +9,12 @@ namespace DSP
 RingMod::RingMod()
 {
 }
-
+// will be called whenever there is a change in the DAW 
 void RingMod::prepare(double newSampleRate)
 {
     sampleRate = newSampleRate;
 
-    // reset phase state
+    // reset phase state (stereo - in quadrature)
     phaseState[0] = 0.f;
     phaseState[1] = static_cast<float>(M_PI / 2.0); // quadature osc between L and R channels
 

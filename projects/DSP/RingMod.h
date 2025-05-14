@@ -6,7 +6,7 @@ namespace DSP
 class RingMod
 {
 public:
-    enum ModType : unsigned int
+    enum ModType : unsigned int // enumeration will assign the values starting from 0
     {
         Sin = 0,
         Tri,
@@ -17,6 +17,8 @@ public:
     ~RingMod() {}
 
     // No copy and move
+    // check online "cpp move semantics" for more information
+    // this is a good practice to avoid creating these functions automatically (the compiler will create them for you if you don't write this)
     RingMod(const RingMod&) = delete;
     RingMod(RingMod&&) = delete;
     const RingMod& operator=(const RingMod&) = delete;
