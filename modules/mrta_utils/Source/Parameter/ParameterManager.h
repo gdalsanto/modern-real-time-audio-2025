@@ -21,15 +21,15 @@ public:
     ~ParameterManager();
 
     // Register a callback lambda function for a parameter ID
-    // This method should prefereably be used on the processors ctor body
+    // This method should preferably be used on the processors ctor body
     // to avoid missing parameter events
     bool registerParameterCallback(const juce::String& ID, Callback cb);
 
     // Checks if there are parameter change events on the queue
     // and call the respective callbacks for them
-    // This method is supposed to be calle on every process buffer
+    // This method is supposed to be called on every process buffer
     // before the audio processing
-    // The optional 'force' argutment will call flush
+    // The optional 'force' arguments will call flush
     // all the current parameter values to the callback
     // regardless if there are events on the queue, this is a
     // good way to guarantee the DSP has updated parameters
