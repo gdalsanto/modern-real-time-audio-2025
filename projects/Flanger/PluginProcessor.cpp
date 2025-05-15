@@ -86,6 +86,7 @@ void FlangerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
     enableRamp.applyGain(fxBuffer.getArrayOfWritePointers(), numChannels, numSamples);
 
     for (int ch = 0; ch < static_cast<int>(numChannels); ++ch)
+        // juce audio buffer method 
         buffer.addFrom(ch, 0, fxBuffer, ch, 0, static_cast<int>(numSamples));
 }
 

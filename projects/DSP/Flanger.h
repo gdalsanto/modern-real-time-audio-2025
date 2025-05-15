@@ -11,8 +11,8 @@ class Flanger
 public:
     enum ModulationType : unsigned int
     {
-        Sin = 0,
-        Tri
+        Sin = 0,    // sinusoidal modulation
+        Tri         // constant  modulation (derivative is a square wave)
     };
 
     Flanger(float maxTimeMs, unsigned int numChannels);
@@ -54,7 +54,7 @@ private:
     double sampleRate { 48000.0 };
 
     DSP::DelayLine delayLine;
-
+    // ramp will avoid zip-like artifacts when changing the parameters
     DSP::Ramp<float> offsetRamp;
     DSP::Ramp<float> modDepthRamp;
 

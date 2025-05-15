@@ -23,6 +23,7 @@ void Flanger::prepare(double newSampleRate, float maxTimeMs, unsigned int numCha
     delayLine.prepare(static_cast<unsigned int>(std::round(maxTimeMs * static_cast<float>(0.001 * sampleRate))), numChannels);
     delayLine.setDelaySamples(static_cast<unsigned int>(std::ceil(0.001 * sampleRate))); // Set fixed delay to 1ms
 
+    // in prepare we set the ramp directly to the target value (skip the ramp at the beginning)
     offsetRamp.prepare(sampleRate, true, offsetMs * static_cast<float>(0.001 * sampleRate));
     modDepthRamp.prepare(sampleRate, true, modDepthMs * static_cast<float>(0.001 * sampleRate));
 

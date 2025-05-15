@@ -27,7 +27,7 @@ public:
     // Dtor
     ~ParametricEqualizer();
 
-    // No default ctor
+    // No default ctor - protection mechanism
     ParametricEqualizer() = delete;
 
     // No copy sematics

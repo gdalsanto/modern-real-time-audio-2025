@@ -9,7 +9,7 @@ namespace DSP
 DelayLine::DelayLine(unsigned int maxLengthSamples, unsigned int numChannels)
 {
     for (unsigned int ch = 0; ch < numChannels; ++ch)
-        delayBuffer.emplace_back(maxLengthSamples, 0.f);
+        delayBuffer.emplace_back(maxLengthSamples, 0.f);    // append
 }
 
 DelayLine::~DelayLine()
@@ -21,11 +21,16 @@ void DelayLine::clear()
     for (auto& b : delayBuffer)
         std::fill(b.begin(), b.end(), 0.f);
 }
-
+// const std::vector<float>& maxLengthSamples in case of a different buffer size per channel
+// The const keyword ensures that the function cannot modify the contents of the std::vector<float> passed to i
+// using const reference in int variable it will end up using more memory because the pointer is larger than the int 
+// but for vectors is is better to use const reference to avoid copying the whole vector (which is something that functions do automatically)
 void DelayLine::prepare(unsigned int maxLengthSamples, unsigned int numChannels)
 {
     delayBuffer.clear();
     for (unsigned int ch = 0; ch < numChannels; ++ch)
+    // this way we don't need to make a vector before "pushing" it with push_back
+    // with emplace_back it get's constructed in place 
         delayBuffer.emplace_back(maxLengthSamples, 0.f);
 }
 

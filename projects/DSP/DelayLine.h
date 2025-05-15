@@ -28,6 +28,7 @@ public:
     // Reallocate delay buffer for the new channel count and clear its contents
     void prepare(unsigned int maxLengthSamples, unsigned int numChannels);
 
+    // different process calls (non modulated and modulated)
     // Process audio with the currently (fixed) set delay time
     void process(float* const* output, const float* const* input, unsigned int numChannels, unsigned int numSamples);
 
@@ -48,7 +49,7 @@ public:
     void setDelaySamples(unsigned int samples);
 
 private:
-    std::vector<std::vector<float>> delayBuffer;
+    std::vector<std::vector<float>> delayBuffer;    // one buffer per channel 
     unsigned int delaySamples { 0 };
     unsigned int writeIndex { 0 };
 };

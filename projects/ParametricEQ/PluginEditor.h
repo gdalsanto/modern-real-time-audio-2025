@@ -19,6 +19,7 @@ public:
 
 private:
     ParametricEQAudioProcessor& audioProcessor;
+    // create one section of parameter pane per each band
     mrta::GenericParameterEditor band0ParameterEditor;
     mrta::GenericParameterEditor band1ParameterEditor;
     mrta::GenericParameterEditor band2ParameterEditor;
