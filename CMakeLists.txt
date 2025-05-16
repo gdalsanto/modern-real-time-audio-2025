@@ -197,3 +197,21 @@ add_plugin(flanger
     INCLUDE_DIRS
         ${dsp_source}
         ${flanger_source})
+
+# modulate comb project
+set(comb_source ${CMAKE_CURRENT_SOURCE_DIR}/projects/ModulatedComb)
+
+add_plugin(comb
+    VERSION 0.1.0
+    PLUGIN_NAME "Modulated Comb"
+    PROD_NAME Comb
+    PROD_CODE Mcmb
+    SYNTH FALSE
+    SOURCES
+        ${comb_source}/PluginEditor.cpp
+        ${comb_source}/PluginProcessor.cpp
+        ${dsp_source}/DelayLine.cpp
+        ${dsp_source}/Comb.cpp
+    INCLUDE_DIRS
+        ${dsp_source}
+        ${comb_source})
