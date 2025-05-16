@@ -43,6 +43,7 @@ void EnvelopeGenerator::process(float* output, unsigned int numSamples)
         doDigital(output, numSamples);
 }
 
+// this will be called when the envelope is triggered by the on/off button in the UI
 void EnvelopeGenerator::start()
 {
     state = ATTACK;
@@ -83,6 +84,7 @@ void EnvelopeGenerator::setAttackTime(float newAttackTimeMs)
     attackLeakyIntCoeff = std::exp(-1.f / static_cast<float>(attackTimeSamples));
 
     if (state == ATTACK)
+    // to make sure you don't get stuck in the attack state
         attackSamplesCounter = std::min(attackTimeSamples - 1, attackSamplesCounter);
 }
 
@@ -126,7 +128,8 @@ void EnvelopeGenerator::doDigital(float* output, unsigned int numSamples)
         case ATTACK:
             if (attackSamplesCounter < attackTimeSamples)
             {
-                currentEnvelope += (1.f - currentEnvelope) / std::fmax(static_cast<float>(attackTimeSamples - attackSamplesCounter), 1.f);
+                // 1 is our target value
+                currentEnvelope += (1.f - currentEnvelope) / std::fmax(static_cast<float>(attackTimeSamples - attackSamplesCounter), 1.f);  // slope 
                 currentEnvelope = std::fmin(currentEnvelope, 1.f);
                 ++attackSamplesCounter;
             }
@@ -138,6 +141,7 @@ void EnvelopeGenerator::doDigital(float* output, unsigned int numSamples)
             break;
 
         case DECAY:
+        // similar logic to attack from/to different values
             if (decaySamplesCounter < decayTimeSamples)
             {
                 currentEnvelope += (sustainLevel - currentEnvelope) / std::fmax(static_cast<float>(decayTimeSamples - decaySamplesCounter), 1.f);
@@ -191,8 +195,9 @@ void EnvelopeGenerator::doAnalog(float* output, unsigned int numSamples)
         case ATTACK:
             if (std::fabs(currentEnvelope - 1.f) > delta)
             {
-                currentEnvelope = (currentEnvelope - 1.1f) * attackLeakyIntCoeff + 1.1f;
-                currentEnvelope = std::fmin(currentEnvelope, 1.f);
+                // a value a bit larger than 1 is needed because leaky integrator never reaches 1
+                currentEnvelope = (currentEnvelope - 1.1f) * attackLeakyIntCoeff + 1.1f; // low pass filter
+                currentEnvelope = std::fmin(currentEnvelope, 1.f);  // 1.f is our actual target 
             }
             else
             {

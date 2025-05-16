@@ -111,7 +111,7 @@ void Oscillator::setType(OscType newType)
     differentiatorState = 0.f;
 }
 
-float Oscillator::dpwSaw()
+float Oscillator::dpwSaw()  // DPW: antialiasing 
 {
     // unipolar to bipolar
     float bipolar = 2.f * phaseState - 1.f;

@@ -5,8 +5,9 @@
 
 void modeMix(float mode, float& lpf, float& bpf, float& hpf)
 {
+    // this way we can morph between the three modes LP BP HP 
     mode = std::clamp(mode, -1.f, 1.f);
-    lpf = std::fmax(-mode, 0.f);
+    lpf = std::fmax(-mode, 0.f);        
     bpf = std::fmax(1.f - std::fabs(mode), 0.f);
     hpf = std::fmax(mode, 0.f);
 }
@@ -119,15 +120,17 @@ void StateVariableFilterAudioProcessor::processBlock(juce::AudioBuffer<float>& b
     bpfOutBuffer.clear();
     hpfOutBuffer.clear();
 
-    // get the freq and reso controls
+    // get the freq and reso controls - these will set the "dc"
     freqRamp.applySum(freqInBuffer.getWritePointer(0), numSamples);
     resoRamp.applySum(resoInBuffer.getWritePointer(0), numSamples);
     freqModAmtRamp.applySum(freqModAmtBuffer.getWritePointer(0), numSamples);
 
-    // calculate LFO in Hz
+    // calculate LFO in Hz - the lfo controls the 
     lfo.process(lfoBuffer.getWritePointer(0), numSamples);
     for (unsigned int n = 0; n < numSamples; ++n)
     {
+        // the maximum modulation amount has to depend on the current frequency
+        // all this allow to have a -1 0 lfo 
         const float curFreq = freqInBuffer.getSample(0, n);
         const float modAmtHz = curFreq * FreqModAmtMax * freqModAmtBuffer.getSample(0, n);
         freqInBuffer.setSample(0, n,

@@ -5,8 +5,10 @@
 namespace DSP
 {
 
-template<typename F>
-class Ramp
+    // F is a tamplate so that we can use either float or double
+    // at run time F will be replaced with the type of the variable we define in the other heather files 
+template<typename F>    
+class Ramp  // it would be could have a leaky integrator ramp instead of a linear ramp 
 {
 public:
     // Default ramp time of 50ms

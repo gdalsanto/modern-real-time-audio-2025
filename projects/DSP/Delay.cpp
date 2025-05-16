@@ -11,8 +11,8 @@ Delay::Delay(float maxTimeMs, unsigned int numChannels) :
     filter(1),
     preDistortionRamp(0.02f),
     postDistortionRamp(0.02f),
-    timeRamp(0.5f),
-    wowRamp(0.02f),
+    timeRamp(0.5f), // compared to the others, it is safe to set a longer ramp time to avoid any zipper like artifacts
+    wowRamp(0.02f),     
     feedbackRamp(0.02f)
 {
 }
@@ -29,16 +29,16 @@ void Delay::prepare(double newSampleRate, float maxTimeMs, unsigned int numChann
     delayLine.setDelaySamples(1); // Keep at least 1 sample minimum fixed delay
 
     filter.setBandType(0, ParametricEqualizer::LowPass);
-    filter.setBandResonance(0, static_cast<float>(M_SQRT1_2));
+    filter.setBandResonance(0, static_cast<float>(M_SQRT1_2));  // buttherworth kind of resonance 1 / sqrt(2) (constant available in math.h) 
     filter.setBandFrequency(0, toneFrequency);
     filter.prepare(sampleRate, numChannels);
 
     const auto distortionLin = std::pow(10.f, 0.05f * distortion);
     preDistortionRamp.prepare(sampleRate, true, distortionLin);
-    postDistortionRamp.prepare(sampleRate, true, 1.f / distortionLin);
+    postDistortionRamp.prepare(sampleRate, true, 1.f / distortionLin);      // not math around this, it's just a rule of thumb
     timeRamp.prepare(sampleRate, true, delayTimeMs * static_cast<float>(sampleRate * 0.001));
     wowRamp.prepare(sampleRate, true, wow * WowDepthMax * static_cast<float>(sampleRate));
-    feedbackRamp.prepare(sampleRate, true, feedback * 0.98f);
+    feedbackRamp.prepare(sampleRate, true, feedback * 0.98f); // avoid full feedback
 
     phaseState[0] = 0.f;
     phaseState[1] = static_cast<float>(M_PI / 2.0);
@@ -64,7 +64,13 @@ void Delay::process(float* const* output, const float* const* input, unsigned in
         float lfo[2] { 0.f, 0.f };
 
         // squared sine modulation
-        lfo[0] = std::pow(0.5f + 0.5f * std::sin(phaseState[0]), 2.f);
+        // (old school dsp peeps would define the  argument of the pow function and multiplying them by themsleves 
+        // const auto lfo_left = 0.5f + 0.5f * std::sin(phaseState[0]);
+        // const auto lfo_right = 0.5f + 0.5f * std::sin(phaseState[1]);
+        // lfo[0] = lfo_left * lfo_left;
+        // lfo[1] = lfo_right * lfo_right;
+        
+        lfo[0] = std::pow(0.5f + 0.5f * std::sin(phaseState[0]), 2.f);  // we are squaring a positive sinewave - this is a very common approach in delay modulation (to simulate the tape)
         lfo[1] = std::pow(0.5f + 0.5f * std::sin(phaseState[1]), 2.f);
 
         // Increment and wrap phase states
@@ -117,7 +123,7 @@ void Delay::setWow(float wowNorm)
 
 void Delay::setFeedback(float feedbackNorm)
 {
-    feedback = std::clamp(feedbackNorm, 0.f, 1.f);
+    feedback = std::clamp(feedbackNorm, 0.f, 1.f);      // redundant, because it can be set in the UI. But this is good practice, so that you can reuse the code without thinking too much about the input value range
     feedbackRamp.setTarget(feedback * 0.98f);
 }
 

@@ -16,13 +16,14 @@ static const std::vector<mrta::ParameterInfo> Parameters
 
 DelayAudioProcessor::DelayAudioProcessor() :
     parameterManager(*this, ProjectInfo::projectName, Parameters),
-    delay(Param::Ranges::TimeMax, 2),
+    delay(Param::Ranges::TimeMax, 2),   // set the delay line with the maximum delay time
     wetRamp(0.05f),
     dryRamp(0.05f)
 {
     parameterManager.registerParameterCallback(Param::ID::Enabled,
     [this](float newValue, bool force)
-    {
+    {   
+        // enable and the dry / wet mix are connected 
         enabled = newValue;
         wetRamp.setTarget(std::clamp(enabled * mix, 0.f, 1.f), force);
         dryRamp.setTarget(std::clamp((1.f - mix) * enabled + (1.f - enabled), 0.f, 1.f), force);
@@ -71,7 +72,7 @@ DelayAudioProcessor::~DelayAudioProcessor()
 {
 }
 
-void DelayAudioProcessor::prepareToPlay(double newSampleRate, int samplesPerBlock)
+void DelayAudioProcessor::prepareToPlay(double newSampleRate, int samplesPerBlock)      // called before playback
 {
     const unsigned int numChannels { static_cast<unsigned int>(std::max(getMainBusNumInputChannels(), getMainBusNumOutputChannels())) };
 
@@ -85,9 +86,9 @@ void DelayAudioProcessor::prepareToPlay(double newSampleRate, int samplesPerBloc
     fxBuffer.clear();
 }
 
-void DelayAudioProcessor::releaseResources()
+void DelayAudioProcessor::releaseResources()    // called before the prepareToPLay
 {
-    delay.clear();
+    delay.clear();  // it's a good idea to clear the delay line on the releaseResources
 }
 
 void DelayAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& /*midiMessages*/)

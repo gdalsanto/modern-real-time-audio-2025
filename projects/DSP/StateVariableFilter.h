@@ -17,7 +17,7 @@ public:
     void prepare(double sampleRate);
 
     void process(float* lpfOut, float* bpfOut, float* hpfOut,
-                 const float* audioIn, const float* freqIn, const float* resoIn,
+                 const float* audioIn, const float* freqIn, const float* resoIn,    // you can modulate with audio 
                  unsigned int numSamples);
 
 private:

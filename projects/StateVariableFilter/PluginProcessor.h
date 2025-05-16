@@ -98,12 +98,12 @@ private:
     float reso { 0.7071f };
     float mode { 0.5f };
 
-    DSP::StateVariableFilter svfLeft;
+    DSP::StateVariableFilter svfLeft;   // SVF are mono (too many inputs otherwise)
     DSP::StateVariableFilter svfRight;
     DSP::Oscillator lfo;
-    DSP::Ramp<float> freqModAmtRamp;
-    DSP::Ramp<float> freqRamp;
-    DSP::Ramp<float> resoRamp;
+    DSP::Ramp<float> freqModAmtRamp;        // frequency modulation amount
+    DSP::Ramp<float> freqRamp;  // center frequency
+    DSP::Ramp<float> resoRamp;  // resonance
     DSP::Ramp<float> lpfRamp;
     DSP::Ramp<float> bpfRamp;
     DSP::Ramp<float> hpfRamp;

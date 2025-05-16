@@ -32,7 +32,7 @@ public:
 private:
     double sampleRate { 48000.0 };
 
-    float attackTimeMs { 10.f };
+    float attackTimeMs { 10.f };    
     float decayTimeMs { 5.f };
     float releaseTimeMs { 50.f };
 
@@ -42,12 +42,14 @@ private:
     unsigned int decayTimeSamples { 0 };
     unsigned int releaseTimeSamples { 0 };
 
+    // state transition counters - will be decremented
     unsigned int attackSamplesCounter { 0 };
     unsigned int decaySamplesCounter { 0 };
     unsigned int releaseSamplesCounter { 0 };
 
     float currentEnvelope { 0.f };
 
+    // leaky integrator coefficients - first order low pass filter (smoothing filter)
     float attackLeakyIntCoeff { 0.f };
     float decayLeakyIntCoeff { 0.f };
     float releaseLeakyIntCoeff { 0.f };
@@ -65,7 +67,7 @@ private:
 
     EnvelopeState state { OFF };
 
-    static constexpr float delta { 1e-3 };
+    static constexpr float delta { 1e-3f }; // -60 dB to indicate that the envelope is off 
 
     void doDigital(float* output, unsigned int numSamples);
     void doAnalog(float* output, unsigned int numSamples);
