@@ -212,6 +212,8 @@ add_plugin(delay
         ${delay_source}/PluginProcessor.cpp
         ${dsp_source}/DelayLine.cpp
         ${dsp_source}/Delay.cpp
+        ${dsp_source}/Meter.cpp
+        ${gui_source}/MeterComponent.cpp
         ${dsp_source}/Biquad.cpp
         ${dsp_source}/ParametricEqualizer.cpp
         ${dsp_source}/Meter.cpp

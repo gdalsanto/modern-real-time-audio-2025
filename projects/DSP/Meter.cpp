@@ -16,7 +16,7 @@ void Meter::prepare(double sampleRate, unsigned int newNumChannels)
 {
     numChannels = std::max(std::min(newNumChannels, MaxNumChannels), 0u);
     envelopeCoeff = std::exp(-1.f / (static_cast<float>(sampleRate * 0.001) * releaseTimeMs));
-    envelopeState.store({ 0.f, 0.f });
+    envelopeState.store({ 0.f, 0.f });  // method of athomic array
 }
 
 void Meter::process(const float* const* input, unsigned int numChannels, unsigned int numSamples)
@@ -34,7 +34,7 @@ void Meter::process(const float* const* input, unsigned int numChannels, unsigne
         }
     }
 
-    envelopeState.store(currentEnvelope);
+    envelopeState.store(currentEnvelope);   // atomic operators - we should make sure that they are read/written only once 
 }
 
 void Meter::process(const float* input, unsigned int numChannels)

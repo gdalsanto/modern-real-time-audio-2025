@@ -32,8 +32,8 @@ void MeterComponent::paint(juce::Graphics& g)
     juce::Rectangle<int> rightChannelArea;
     if (numChannels > 1)
     {
-        rightEnvelope = meter.getEnvelope(1);
-        rightEnvelopeDb = 20.f * std::log10(std::fmax(rightEnvelope, 1e-6));
+        float rightEnvelope = meter.getEnvelope(1);
+        float rightEnvelopeDb = 20.f * std::log10(std::fmax(rightEnvelope, 1e-6));
 
         leftChannelArea = totalArea.removeFromLeft(getWidth() / 2);
         rightChannelArea = totalArea;
@@ -66,7 +66,7 @@ void MeterComponent::paint(juce::Graphics& g)
 
 void MeterComponent::timerCallback()
 {
-    repaint();
+    repaint();  // repaint the component every 60ms
 }
 
 }

@@ -19,6 +19,5 @@ private:
     DelayAudioProcessor& audioProcessor;
     mrta::GenericParameterEditor genericParameterEditor;
     GUI::MeterComponent meterComponent;
-
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DelayAudioProcessorEditor)
 };

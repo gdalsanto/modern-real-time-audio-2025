@@ -21,7 +21,6 @@ DelayAudioProcessor::DelayAudioProcessor() :
     dryRamp(0.05f)
 {
     meter.setTimeConstant(150.f);
-
     parameterManager.registerParameterCallback(Param::ID::Enabled,
     [this](float newValue, bool force)
     {
@@ -81,7 +80,6 @@ void DelayAudioProcessor::prepareToPlay(double newSampleRate, int samplesPerBloc
     wetRamp.prepare(newSampleRate);
     dryRamp.prepare(newSampleRate);
     meter.prepare(newSampleRate, numChannels);
-
     parameterManager.updateParameters(true);
 
     fxBuffer.setSize(static_cast<int>(numChannels), samplesPerBlock);
@@ -105,7 +103,7 @@ void DelayAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::
         fxBuffer.copyFrom(ch, 0, buffer, ch, 0, static_cast<int>(numSamples));
 
     delay.process(fxBuffer.getArrayOfWritePointers(), fxBuffer.getArrayOfReadPointers(), numChannels, numSamples);
-    meter.process(fxBuffer.getArrayOfReadPointers(), numChannels, numSamples);
+    meter.process(fxBuffer.getArrayOfReadPointers(), numChannels, numSamples);  // envelope detector will be constantly updated
 
     wetRamp.applyGain(fxBuffer.getArrayOfWritePointers(), numChannels, numSamples);
     dryRamp.applyGain(buffer.getArrayOfWritePointers(), numChannels, numSamples);

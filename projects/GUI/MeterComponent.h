@@ -11,7 +11,7 @@ class MeterComponent : public juce::Component,
                        public juce::Timer
 {
 public:
-    MeterComponent(DSP::Meter& meter);
+    MeterComponent(DSP::Meter& meter);  // reference to the meter object that is running in the DSP thread
     ~MeterComponent();
 
     static constexpr float MIN_DB_SCALE { -90.f };
