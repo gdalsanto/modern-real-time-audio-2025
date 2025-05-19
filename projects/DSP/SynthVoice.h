@@ -10,6 +10,10 @@ namespace DSP
 
 float convertMidiNoteToFreq(int MidiNote);
 
+
+// The SynthesiserSound is a passive class that just describes what the sound is -
+// the actual audio rendering for a sound is done by a SynthesiserVoice. This allows
+// more than one SynthesiserVoice to play the same sound at the same time.
 class SynthSound : public juce::SynthesiserSound
 {
 public:
@@ -31,8 +35,10 @@ public:
     void setWaveType(Oscillator::OscType type);
     void setAttRelTime(float newAttRelTimeMs);
 
-    bool canPlaySound(SynthesiserSound* ptr) override;
-    void startNote(int midiNoteNumber, float velocity, SynthesiserSound*, int currentPitchWheelPosition) override;
+    // These methods have been already defined in the SynthesiserVoice class
+    // so we need to override them to use our own implementation 
+    bool canPlaySound(SynthesiserSound* ptr) override;  // in the library is "= 0 " so we must re-implement it
+    void startNote(int midiNoteNumber, float velocity, SynthesiserSound*, int currentPitchWheelPosition) override; 
     void stopNote(float velocity, bool allowTailOff) override;
     void pitchWheelMoved(int newPitchWheelValue) override;
     void controllerMoved(int controllerNumber, int newControllerValue) override;

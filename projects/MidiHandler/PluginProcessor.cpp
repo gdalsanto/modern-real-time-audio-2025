@@ -16,13 +16,15 @@ static const std::vector<mrta::ParameterInfo> paramVector
 MidiHandlerAudioProcessor::MidiHandlerAudioProcessor() :
     paramManager(*this, ProjectInfo::projectName, paramVector)
 {
+    // the new operator allocates memory on the heap 
     voice = new DSP::SynthVoice();
     synth.addSound(new DSP::SynthSound());
-    synth.addVoice(voice);
+    synth.addVoice(voice);  // any class derived from SynthesiserVoice will do 
 
     paramManager.registerParameterCallback(Param::ID::AttRelTime,
     [this] (float value, bool /*force*/)
     {
+        // when you're using a pointer to a class, you use the arrow operator instead of the dot operator
         voice->setAttRelTime(value);
     });
 
