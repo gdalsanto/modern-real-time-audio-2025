@@ -216,6 +216,7 @@ add_plugin(delay
         ${dsp_source}/ParametricEqualizer.cpp
         ${dsp_source}/Meter.cpp
         ${gui_source}/MeterComponent.cpp
+        ${gui_source}/MrtaLAF.cpp
     INCLUDE_DIRS
         ${dsp_source}
         ${gui_source}
