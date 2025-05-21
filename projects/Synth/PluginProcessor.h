@@ -141,11 +141,12 @@ public:
     void changeProgramName(int, const juce::String&) override;
     //==============================================================================
 
+    // polyphony
     static constexpr size_t NUM_VOICES { 8 };
 
 private:
     mrta::ParameterManager paramManager;
-    std::vector<DSP::SynthVoice*> voices;
+    std::vector<DSP::SynthVoice*> voices;   // NOTE: this is a vector of pointers to voices - the juce:synth class will take care of handling the memory
     juce::Synthesiser synth;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SynthAudioProcessor)

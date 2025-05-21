@@ -72,6 +72,7 @@ public:
     void setOutputVol(float dB, bool skipRamp);
 
 
+    // Synth Voice methods 
     bool canPlaySound(juce::SynthesiserSound* ptr) override;
     void startNote(int midiNoteNumber, float velocity, juce::SynthesiserSound*, int currentPitchWheelPosition) override;
     void stopNote(float velocity, bool allowTailOff) override;
@@ -88,10 +89,10 @@ public:
     static constexpr float FreqModRange { 10000.f };
 
 private:
-    double sampleRate { 1.0 };
+    double sampleRate { 1.0 };  // don't set it to 0.0 ( as it is usually used as denominator )
 
     float lfoFreq { 1.f };
-    float velocity { 1.f };
+    float velocity { 1.f }; // no ramp: the ramp time will accumulate with the envelope 
 
     Oscillator sinOsc;
     Oscillator triOsc;
@@ -121,7 +122,7 @@ private:
     Ramp<float> vcfBPFRamp;
     Ramp<float> vcfHPFRamp;
 
-    bool voiceStarted { false };
+    bool voiceStarted { false };    // needed for polyphony 
 };
 
 }

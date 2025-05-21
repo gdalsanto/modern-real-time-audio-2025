@@ -3,6 +3,7 @@
 
 void setOscSawVol(std::vector<DSP::SynthVoice*> voices, float dB, bool skipRamp)
 {
+    // call setOscSawVol for each voice
     std::for_each(voices.begin(), voices.end(), [dB, skipRamp] (auto& v) { v->setOscSawVol(dB, skipRamp); });
 }
 
@@ -183,7 +184,11 @@ void SynthAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::M
     juce::ScopedNoDenormals noDenormals;
     paramManager.updateParameters();
 
+    // always clear the output buffer before processing (this is helpful in abl)
     buffer.clear();
+    // everything should be done inside the renderNextBlock function
+    // if you have effects that can be applied after the synth (like reverb, delay, etc.)
+    // you can do that after this call
     synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
 }
 

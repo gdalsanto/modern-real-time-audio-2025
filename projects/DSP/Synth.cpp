@@ -10,6 +10,7 @@ float convertMidiNoteToFreq(int MidiNote)
 
 SynthVoice::SynthVoice()
 {
+    // set oscillator to their voice type
     sawOsc.setType(Oscillator::SawAA);
     triOsc.setType(Oscillator::TriAA);
     sinOsc.setType(Oscillator::Sin);
@@ -22,6 +23,7 @@ SynthVoice::~SynthVoice()
 {
 }
 
+// allow skip ramp when we call prepare to play (in the PluginProcessor)
 void SynthVoice::setOscSawVol(float dB, bool skipRamp)
 {
     sawOscVolRamp.setTarget(std::pow(10.f, 0.05f * dB), skipRamp);
@@ -148,6 +150,7 @@ void SynthVoice::stopNote(float velocity, bool allowTailOff)
     vcaEnvGen.end();
     vcfEnvGen.end();
 
+    // for polyphony - to allow voice stealing 
     if (!allowTailOff)
         clearCurrentNote();
 }
@@ -191,6 +194,7 @@ void SynthVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffer, int sta
 
     for (int i = 0; i < numSamples; ++i)
     {
+        // calculate all the modulation values before processing
         const auto sin { sinOsc.process() };
         const auto tri { triOsc.process() };
         const auto saw { sawOsc.process() };
@@ -217,7 +221,7 @@ void SynthVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffer, int sta
 
         const auto outputVol { outputVolRamp.getNext() };
 
-        // Process LFO acording to mod type
+        // Process LFO according to mod type
         float lfo { 0.f };
         switch (lfoType)
         {
@@ -233,6 +237,7 @@ void SynthVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffer, int sta
 
         const auto oscOut { (sin * sinVol + tri * triVol + saw * sawVol) * oscVol * vcaEnv * velocity };
         const auto freqMod { std::clamp(vcfEnv * vcfEnvAmout + vcfLFOAmount * lfo, -1.f, 1.f) };
+        // exponential mapping of the frequency modulation [-1/2 , 1]
         const auto freq { std::clamp(FreqModRange * (std::pow(2.f, freqMod) - 1.f) + vcfFreq, MinFreqHz, MaxFreqHz) };
 
         float lpfOut { 0.f };
@@ -243,11 +248,13 @@ void SynthVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffer, int sta
         const auto out { (vcfLPF * lpfOut + vcfBPF * bpfOut + vcfHPF * hpfOut) * outputVol };
         for (int ch = 0; ch < outputBuffer.getNumChannels(); ++ch)
         {
+            // do not just write to the output buffer, you have to add to it (for polyphony)
             outputBuffer.addSample(ch, startSample + i, out);
         }
 
         if (voiceStarted && vcaEnvGen.isOff() && vcfEnvGen.isOff())
         {
+            // the voice becomes available for stealing
             voiceStarted = false;
             clearCurrentNote();
         }
