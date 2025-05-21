@@ -292,3 +292,23 @@ add_plugin(svf
     INCLUDE_DIRS
         ${dsp_source}
         ${svf_source})
+
+# synthesizer project
+set(synth_source ${CMAKE_CURRENT_SOURCE_DIR}/projects/MySynthesizer)
+
+add_plugin(synth
+    VERSION 0.1.0
+    PLUGIN_NAME "My Synthesizer"
+    PROD_NAME MySynthesizer
+    PROD_CODE Synth
+    SYNTH TRUE
+    SOURCES
+        ${synth_source}/PluginEditor.cpp
+        ${synth_source}/PluginProcessor.cpp
+        ${dsp_source}/StateVariableFilter.cpp
+        ${dsp_source}/Oscillator.cpp
+        ${dsp_source}/SynthVoice.cpp
+        ${dsp_source}/EnvelopeGenerator.cpp
+    INCLUDE_DIRS
+        ${dsp_source}
+        ${synth_source})
