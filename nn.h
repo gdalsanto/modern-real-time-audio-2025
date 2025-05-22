@@ -69,7 +69,7 @@ class Mlp
             }
         }
     }
-
+    def export_to_cpp()
 private: 
     // define the weights and biases for the input later, output later and hidden layer 
     float weight_input[INPUT_SIZE][HIDDEN_SIZE];
